@@ -1,0 +1,1690 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>SDDI — Kuesioner Individu Keluarga</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #0f1923;
+    --ink2: #2d3f50;
+    --muted: #6b8097;
+    --line: #dce6ef;
+    --bg: #f0f4f8;
+    --card: #ffffff;
+    --accent: #1a6bff;
+    --accent2: #0049cc;
+    --green: #00b86b;
+    --red: #ff3d3d;
+    --yellow: #ffb800;
+    --radius: 14px;
+    --shadow: 0 2px 12px rgba(15,25,35,0.08);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  
+  body {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ── TOP BAR ── */
+  .topbar {
+    position: sticky; top: 0; z-index: 100;
+    background: var(--ink);
+    padding: 14px 18px;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .topbar-logo {
+    width: 32px; height: 32px; border-radius: 8px;
+    background: var(--accent);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; font-weight: 800; color: #fff;
+    flex-shrink: 0;
+  }
+  .topbar-title { flex: 1; }
+  .topbar-title h1 { font-size: 13px; font-weight: 700; color: #fff; line-height: 1.2; }
+  .topbar-title p  { font-size: 10px; color: #8fa3b8; margin-top: 1px; }
+  .topbar-badge {
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.15);
+    color: #adc5de;
+    font-size: 10px; font-weight: 600;
+    padding: 3px 8px; border-radius: 20px;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  /* ── PROGRESS ── */
+  .progress-wrap {
+    background: var(--ink2);
+    padding: 10px 18px 14px;
+  }
+  .progress-steps {
+    display: flex; gap: 4px; margin-bottom: 8px;
+  }
+  .ps {
+    flex: 1; height: 3px; border-radius: 99px;
+    background: rgba(255,255,255,0.15);
+    transition: background 0.3s;
+  }
+  .ps.done { background: var(--green); }
+  .ps.active { background: var(--accent); }
+  .progress-label {
+    font-size: 11px; color: #8fa3b8;
+    display: flex; justify-content: space-between;
+  }
+  .progress-label span { color: #fff; font-weight: 600; }
+
+  /* ── SECTIONS ── */
+  .section { display: none; padding: 16px 16px 100px; animation: fadeUp 0.35s ease; }
+  .section.active { display: block; }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .section-header {
+    background: var(--accent);
+    color: #fff;
+    padding: 14px 16px;
+    border-radius: var(--radius) var(--radius) 0 0;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .section-header .snum {
+    width: 28px; height: 28px;
+    background: rgba(255,255,255,0.2);
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 700; flex-shrink: 0;
+  }
+  .section-header h2 { font-size: 14px; font-weight: 700; line-height: 1.3; }
+  .section-header p  { font-size: 11px; opacity: 0.8; margin-top: 1px; }
+
+  .card {
+    background: var(--card);
+    border-radius: 0 0 var(--radius) var(--radius);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+  }
+
+  /* ── FIELDS ── */
+  .field {
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--line);
+  }
+  .field:last-child { border-bottom: none; }
+
+  .field-label {
+    font-size: 12px; font-weight: 600;
+    color: var(--muted); margin-bottom: 4px;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .field-label .fnum {
+    background: var(--bg);
+    color: var(--ink2);
+    font-size: 10px; font-weight: 700;
+    padding: 1px 6px; border-radius: 4px;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .field-label .req { color: var(--red); margin-left: 2px; }
+
+  .field-label .badge {
+    font-size: 9px; padding: 1px 6px;
+    border-radius: 4px; font-weight: 600;
+  }
+  .badge-age { background: #e8f4ff; color: #1a6bff; }
+  .badge-cond { background: #fff4e0; color: #cc7700; }
+
+  input[type=text], input[type=number], input[type=date], select, textarea {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1.5px solid var(--line);
+    border-radius: 10px;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 14px;
+    color: var(--ink);
+    background: var(--bg);
+    outline: none;
+    transition: border-color 0.2s, background 0.2s;
+    -webkit-appearance: none;
+  }
+  input:focus, select:focus, textarea:focus {
+    border-color: var(--accent);
+    background: #fff;
+  }
+  input.error, select.error { border-color: var(--red); background: #fff5f5; }
+
+  .input-group { display: flex; gap: 8px; }
+  .input-group input { flex: 1; }
+  .input-hint { font-size: 11px; color: var(--muted); margin-top: 4px; }
+
+  /* ── RADIO / CHECKBOX GRID ── */
+  .opt-grid {
+    display: grid;
+    gap: 6px;
+    grid-template-columns: 1fr 1fr;
+    margin-top: 6px;
+  }
+  .opt-grid.cols1 { grid-template-columns: 1fr; }
+  .opt-grid.cols3 { grid-template-columns: 1fr 1fr 1fr; }
+
+  .opt-btn {
+    display: flex; align-items: center; gap: 8px;
+    padding: 9px 12px;
+    border: 1.5px solid var(--line);
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 12px; font-weight: 500;
+    color: var(--ink2);
+    background: var(--bg);
+    transition: all 0.15s;
+    user-select: none;
+    line-height: 1.3;
+  }
+  .opt-btn:active { transform: scale(0.97); }
+  .opt-btn.selected {
+    border-color: var(--accent);
+    background: #e8f0ff;
+    color: var(--accent);
+    font-weight: 600;
+  }
+  .opt-dot {
+    width: 16px; height: 16px;
+    border: 2px solid currentColor;
+    border-radius: 50%;
+    flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .opt-dot::after {
+    content: ''; width: 7px; height: 7px;
+    background: currentColor; border-radius: 50%;
+    opacity: 0; transition: opacity 0.15s;
+  }
+  .opt-btn.selected .opt-dot::after { opacity: 1; }
+
+  .chk-btn .opt-dot { border-radius: 4px; }
+  .chk-btn.selected .opt-dot::after {
+    content: '✓'; font-size: 10px; font-weight: 700;
+    background: transparent; opacity: 1;
+  }
+
+  /* ── ANGGOTA TABS ── */
+  .member-tabs {
+    display: flex; gap: 6px;
+    overflow-x: auto; padding: 14px 16px 0;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .member-tabs::-webkit-scrollbar { display: none; }
+
+  .member-tab {
+    flex-shrink: 0;
+    padding: 7px 14px;
+    border-radius: 20px;
+    border: 1.5px solid var(--line);
+    font-size: 12px; font-weight: 600;
+    cursor: pointer;
+    background: var(--bg);
+    color: var(--muted);
+    transition: all 0.2s;
+  }
+  .member-tab.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+  }
+  .member-tab.add-tab {
+    border-style: dashed;
+    color: var(--accent);
+  }
+
+  .member-panel { display: none; padding: 14px 16px; }
+  .member-panel.active { display: block; }
+
+  /* ── BOTTOM NAV ── */
+  .bottom-nav {
+    position: fixed; bottom: 0; left: 0; right: 0;
+    background: #fff;
+    border-top: 1px solid var(--line);
+    padding: 12px 16px;
+    display: flex; gap: 10px;
+    box-shadow: 0 -4px 20px rgba(15,25,35,0.08);
+  }
+
+  .btn {
+    flex: 1; padding: 13px;
+    border-radius: 12px; border: none;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 14px; font-weight: 700;
+    cursor: pointer; transition: all 0.15s;
+  }
+  .btn:active { transform: scale(0.97); }
+  .btn-outline {
+    background: var(--bg);
+    color: var(--ink2);
+    border: 1.5px solid var(--line);
+  }
+  .btn-primary {
+    background: var(--accent);
+    color: #fff;
+  }
+  .btn-primary:hover { background: var(--accent2); }
+  .btn-success {
+    background: var(--green);
+    color: #fff;
+  }
+
+  /* ── SUMMARY ── */
+  .summary-item {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--line);
+    display: flex; justify-content: space-between; align-items: flex-start;
+    gap: 12px;
+  }
+  .summary-item:last-child { border-bottom: none; }
+  .summary-key { font-size: 12px; color: var(--muted); }
+  .summary-val { font-size: 13px; font-weight: 600; text-align: right; max-width: 55%; }
+
+  .alert {
+    padding: 12px 14px;
+    border-radius: 10px;
+    font-size: 12px;
+    margin-bottom: 12px;
+    display: flex; gap: 8px; align-items: flex-start;
+  }
+  .alert-info { background: #e8f4ff; color: #1a4baa; }
+  .alert-warn { background: #fff4e0; color: #925a00; }
+
+  /* ── TOAST ── */
+  .toast {
+    position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%) translateY(20px);
+    background: var(--ink);
+    color: #fff;
+    padding: 10px 18px;
+    border-radius: 20px;
+    font-size: 13px; font-weight: 600;
+    opacity: 0;
+    transition: all 0.3s;
+    pointer-events: none;
+    white-space: nowrap;
+    z-index: 999;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  /* ── DIVIDER ── */
+  .divider-label {
+    font-size: 11px; font-weight: 700;
+    color: var(--muted);
+    text-transform: uppercase; letter-spacing: 0.05em;
+    padding: 10px 16px 6px;
+    background: var(--bg);
+    border-bottom: 1px solid var(--line);
+  }
+
+  /* ── STATUS BADGE ── */
+  .status-row {
+    display: flex; gap: 8px;
+    padding: 12px 16px;
+    background: var(--bg);
+    border-bottom: 1px solid var(--line);
+    flex-wrap: wrap;
+  }
+  .status-chip {
+    font-size: 11px; font-weight: 600;
+    padding: 3px 10px; border-radius: 20px;
+    background: var(--line); color: var(--muted);
+  }
+  .status-chip.ok { background: #e0f9ec; color: #00804d; }
+
+  select option { font-size: 14px; }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-logo">S</div>
+  <div class="topbar-title">
+    <h1>Satu Data Desa Indonesia</h1>
+    <p>Kuesioner Individu & Keluarga</p>
+  </div>
+  <div class="topbar-badge">SDDI</div>
+</div>
+
+<div class="progress-wrap">
+  <div class="progress-steps" id="progressSteps"></div>
+  <div class="progress-label">
+    <span id="sectionName">I. Keterangan Tempat</span>
+    <span id="sectionCount">1 / 6</span>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- ======================================================
+     BLOK I — KETERANGAN TEMPAT
+====================================================== -->
+<div class="section active" id="sec1">
+  <div class="section-header">
+    <div class="snum">I</div>
+    <div>
+      <h2>Keterangan Tempat</h2>
+      <p>Lokasi dan identitas keluarga</p>
+    </div>
+  </div>
+  <div class="card">
+
+    <div class="field">
+      <div class="field-label"><span class="fnum">101</span> Provinsi <span class="req">*</span></div>
+      <input type="text" id="f101" placeholder="Nama provinsi..." oninput="save()">
+    </div>
+    <div class="field">
+      <div class="field-label"><span class="fnum">102</span> Kabupaten/Kota <span class="req">*</span></div>
+      <input type="text" id="f102" placeholder="Nama kabupaten/kota...">
+    </div>
+    <div class="field">
+      <div class="field-label"><span class="fnum">103</span> Kecamatan <span class="req">*</span></div>
+      <input type="text" id="f103" placeholder="Nama kecamatan...">
+    </div>
+    <div class="field">
+      <div class="field-label"><span class="fnum">104</span> Desa/Kelurahan <span class="req">*</span></div>
+      <input type="text" id="f104" placeholder="Nama desa/kelurahan...">
+    </div>
+    <div class="field">
+      <div class="field-label"><span class="fnum">105</span> Kode SLS/Non SLS</div>
+      <div class="input-group">
+        <input type="text" id="f105a" placeholder="Kode SLS" maxlength="10">
+        <input type="text" id="f105b" placeholder="Kode Sub SLS" maxlength="10">
+      </div>
+    </div>
+    <div class="field">
+      <div class="field-label"><span class="fnum">106</span> Nama SLS/Non SLS</div>
+      <input type="text" id="f106" placeholder="Nama SLS...">
+    </div>
+    <div class="field">
+      <div class="field-label"><span class="fnum">107</span> Alamat</div>
+      <input type="text" id="f107" placeholder="Jalan/Gang, Nomor Rumah...">
+    </div>
+    <div class="field">
+      <div class="field-label"><span class="fnum">108</span> Nama Kepala Keluarga <span class="req">*</span></div>
+      <input type="text" id="f108" placeholder="Nama sesuai KK...">
+    </div>
+    <div class="field">
+      <div class="field-label"><span class="fnum">109</span> Nomor Urut Bangunan Tempat Tinggal</div>
+      <input type="number" id="f109" placeholder="Nomor urut...">
+    </div>
+    <div class="field">
+      <div class="field-label"><span class="fnum">110</span> Nomor Urut Keluarga Hasil Verifikasi</div>
+      <input type="number" id="f110" placeholder="Nomor urut verifikasi...">
+    </div>
+    <div class="field">
+      <div class="field-label"><span class="fnum">111</span> Status Keluarga</div>
+      <div class="opt-grid cols1">
+        <div class="opt-btn" onclick="selectOpt(this,'f111','0')"><div class="opt-dot"></div>KK Sesuai</div>
+        <div class="opt-btn" onclick="selectOpt(this,'f111','1')"><div class="opt-dot"></div>Keluarga Induk</div>
+        <div class="opt-btn" onclick="selectOpt(this,'f111','2')"><div class="opt-dot"></div>Keluarga Pecahan</div>
+      </div>
+      <input type="hidden" id="f111">
+    </div>
+    <div class="field">
+      <div class="field-label"><span class="fnum">112</span> Jumlah Anggota Keluarga <span class="req">*</span></div>
+      <input type="number" id="f112" placeholder="Jumlah anggota..." min="1" max="20" onchange="updateMemberCount()">
+    </div>
+    <div class="field">
+      <div class="field-label"><span class="fnum">113</span> ID Landmark</div>
+      <input type="text" id="f113" placeholder="ID Landmark...">
+    </div>
+    <div class="field">
+      <div class="field-label"><span class="fnum">114</span> Nomor Kartu Keluarga</div>
+      <input type="text" id="f114" placeholder="16 digit nomor KK..." maxlength="16">
+    </div>
+    <div class="field">
+      <div class="field-label"><span class="fnum">115</span> Kode Kartu Keluarga (KK)</div>
+      <div class="opt-grid cols1">
+        <div class="opt-btn" onclick="selectOpt(this,'f115','0')"><div class="opt-dot"></div>KK Sesuai</div>
+        <div class="opt-btn" onclick="selectOpt(this,'f115','1')"><div class="opt-dot"></div>Keluarga Induk</div>
+        <div class="opt-btn" onclick="selectOpt(this,'f115','2')"><div class="opt-dot"></div>Keluarga Pecahan</div>
+      </div>
+      <input type="hidden" id="f115">
+    </div>
+
+  </div>
+</div>
+
+<!-- ======================================================
+     BLOK II — KETERANGAN PETUGAS
+====================================================== -->
+<div class="section" id="sec2">
+  <div class="section-header">
+    <div class="snum">II</div>
+    <div>
+      <h2>Keterangan Petugas</h2>
+      <p>Data PPL & PML</p>
+    </div>
+  </div>
+  <div class="card">
+
+    <div class="field">
+      <div class="field-label"><span class="fnum">201</span> Tanggal Pendataan <span class="req">*</span></div>
+      <input type="date" id="f201">
+    </div>
+    <div class="field">
+      <div class="field-label"><span class="fnum">202</span> Nama PPL</div>
+      <div class="input-group">
+        <input type="text" id="f202a" placeholder="Nama PPL..." style="flex:3">
+        <input type="text" id="f202b" placeholder="Kode" style="flex:1">
+      </div>
+    </div>
+    <div class="field">
+      <div class="field-label"><span class="fnum">203</span> Tanggal Pemeriksaan</div>
+      <input type="date" id="f203">
+    </div>
+    <div class="field">
+      <div class="field-label"><span class="fnum">204</span> Nama PML</div>
+      <div class="input-group">
+        <input type="text" id="f204a" placeholder="Nama PML..." style="flex:3">
+        <input type="text" id="f204b" placeholder="Kode" style="flex:1">
+      </div>
+    </div>
+    <div class="field">
+      <div class="field-label"><span class="fnum">205</span> Hasil Pendataan Keluarga <span class="req">*</span></div>
+      <div class="opt-grid cols1">
+        <div class="opt-btn" onclick="selectOpt(this,'f205','1')"><div class="opt-dot"></div>1 — Terisi lengkap</div>
+        <div class="opt-btn" onclick="selectOpt(this,'f205','2')"><div class="opt-dot"></div>2 — Terisi tidak lengkap</div>
+        <div class="opt-btn" onclick="selectOpt(this,'f205','3')"><div class="opt-dot"></div>3 — Tidak ada responden</div>
+        <div class="opt-btn" onclick="selectOpt(this,'f205','4')"><div class="opt-dot"></div>4 — Responden menolak</div>
+        <div class="opt-btn" onclick="selectOpt(this,'f205','5')"><div class="opt-dot"></div>5 — Keluarga pindah/bangunan tidak ada</div>
+      </div>
+      <input type="hidden" id="f205">
+    </div>
+    <div class="field">
+      <div class="field-label">Nomor HP Responden</div>
+      <input type="text" id="f_hp" placeholder="08xx-xxxx-xxxx...">
+    </div>
+
+  </div>
+</div>
+
+<!-- ======================================================
+     BLOK III — KETERANGAN PERUMAHAN
+====================================================== -->
+<div class="section" id="sec3">
+  <div class="section-header">
+    <div class="snum">III</div>
+    <div>
+      <h2>Keterangan Perumahan</h2>
+      <p>Status, fasilitas, dan kondisi tempat tinggal</p>
+    </div>
+  </div>
+  <div class="card">
+
+    <div class="field">
+      <div class="field-label"><span class="fnum">301a</span> Status Kepemilikan Bangunan <span class="req">*</span></div>
+      <div class="opt-grid cols1">
+        <div class="opt-btn" onclick="selectOpt(this,'f301a','1'); toggle301b(1)"><div class="opt-dot"></div>1 — Milik sendiri</div>
+        <div class="opt-btn" onclick="selectOpt(this,'f301a','2'); toggle301b(0)"><div class="opt-dot"></div>2 — Kontrak/sewa</div>
+        <div class="opt-btn" onclick="selectOpt(this,'f301a','3'); toggle301b(0)"><div class="opt-dot"></div>3 — Bebas sewa</div>
+        <div class="opt-btn" onclick="selectOpt(this,'f301a','4'); toggle301b(0)"><div class="opt-dot"></div>4 — Dinas</div>
+        <div class="opt-btn" onclick="selectOpt(this,'f301a','5'); toggle301b(0)"><div class="opt-dot"></div>5 — Lainnya</div>
+      </div>
+      <input type="hidden" id="f301a">
+    </div>
+
+    <div class="field" id="field301b" style="display:none">
+      <div class="field-label"><span class="fnum">301b</span> <span class="badge badge-cond">Jika 301a = 1</span> Jenis Bukti Kepemilikan</div>
+      <div class="opt-grid cols1">
+        <div class="opt-btn" onclick="selectOpt(this,'f301b','1')"><div class="opt-dot"></div>1 — SHM atas Nama Anggota Keluarga</div>
+        <div class="opt-btn" onclick="selectOpt(this,'f301b','2')"><div class="opt-dot"></div>2 — SHM bukan a.n AK — dengan perjanjian tertulis</div>
+        <div class="opt-btn" onclick="selectOpt(this,'f301b','3')"><div class="opt-dot"></div>3 — SHM bukan a.n AK — tanpa perjanjian tertulis</div>
+        <div class="opt-btn" onclick="selectOpt(this,'f301b','4')"><div class="opt-dot"></div>4 — Sertifikat selain SHM (SHGB, SHSRS)</div>
+        <div class="opt-btn" onclick="selectOpt(this,'f301b','5')"><div class="opt-dot"></div>5 — Surat bukti lainnya (Girik, Letter C)</div>
+        <div class="opt-btn" onclick="selectOpt(this,'f301b','6')"><div class="opt-dot"></div>6 — Tidak Punya</div>
+      </div>
+      <input type="hidden" id="f301b">
+    </div>
+
+    <div class="field">
+      <div class="field-label"><span class="fnum">302</span> Luas Lantai Bangunan (m²) <span class="req">*</span></div>
+      <input type="number" id="f302" placeholder="Luas dalam m²..." min="0">
+    </div>
+
+    <div class="field">
+      <div class="field-label"><span class="fnum">303</span> Jenis Lantai Terluas <span class="req">*</span></div>
+      <div class="opt-grid">
+        <div class="opt-btn" onclick="selectOpt(this,'f303','1')"><div class="opt-dot"></div>Marmer/granit</div>
+        <div class="opt-btn" onclick="selectOpt(this,'f303','2')"><div class="opt-dot"></div>Keramik</div>
+        <div class="opt-btn" onclick="selectOpt(this,'f303','3')"><div class="opt-dot"></div>Parket/vinil/karpet</div>
+        <div class="opt-btn" onclick="selectOpt(this,'f303','4')"><div class="opt-dot"></div>Ubin/tegel/teraso</div>
+        <div class="opt-btn" onclick="selectOpt(this,'f303','5')"><div class="opt-dot"></div>Kayu/papan</div>
+        <div class="opt-btn" onclick="selectOpt(this,'f303','6')"><div class="opt-dot"></div>Semen/bata merah</div>
+        <div class="opt-btn" onclick="selectOpt(this,'f303','7')"><div class="opt-dot"></div>Bambu</div>
+        <div class="opt-btn" onclick="selectOpt(this,'f303','8')"><div class="opt-dot"></div>Tanah</div>
+        <div class="opt-btn" onclick="selectOpt(this,'f303','9')"><div class="opt-dot"></div>Lainnya</div>
+      </div>
+      <input type="hidden" id="f303">
+    </div>
+
+    <div class="field">
+      <div class="field-label"><span class="fnum">304</span> Jenis Dinding Terluas <span class="req">*</span></div>
+      <div class="opt-grid cols1">
+        <div class="opt-btn" onclick="selectOpt(this,'f304','1')"><div class="opt-dot"></div>1 — Tembok</div>
+        <div class="opt-btn" onclick="selectOpt(this,'f304','2')"><div class="opt-dot"></div>2 — Plesteran anyaman bambu/kawat</div>
+        <div class="opt-btn" onclick="selectOpt(this,'f304','3')"><div class="opt-dot"></div>3 — Kayu/Papan/Gypsum/GRC/Calciboard</div>
+        <div class="opt-btn" onclick="selectOpt(this,'f304','4')"><div class="opt-dot"></div>4 — Anyaman bambu</div>
+        <div class="opt-btn" onclick="selectOpt(this,'f304','5')"><div class="opt-dot"></div>5 — Batang kayu</div>
+        <div class="opt-btn" onclick="selectOpt(this,'f304','6')"><div class="opt-dot"></div>6 — Bambu</div>
+        <div class="opt-btn" onclick="selectOpt(this,'f304','7')"><div class="opt-dot"></div>7 — Lainnya</div>
+      </div>
+      <input type="hidden" id="f304">
+    </div>
+
+    <div class="field">
+      <div class="field-label"><span class="fnum">305</span> Jenis Atap Terluas <span class="req">*</span></div>
+      <div class="opt-grid">
+        <div class="opt-btn" onclick="selectOpt(this,'f305','1')"><div class="opt-dot"></div>Beton</div>
+        <div class="opt-btn" onclick="selectOpt(this,'f305','2')"><div class="opt-dot"></div>Genteng</div>
+        <div class="opt-btn" onclick="selectOpt(this,'f305','3')"><div class="opt-dot"></div>Seng</div>
+        <div class="opt-btn" onclick="selectOpt(this,'f305','4')"><div class="opt-dot"></div>Asbes</div>
+        <div class="opt-btn" onclick="selectOpt(this,'f305','5')"><div class="opt-dot"></div>Bambu</div>
+        <div class="opt-btn" onclick="selectOpt(this,'f305','6')"><div class="opt-dot"></div>Kayu/sirap</div>
+        <div class="opt-btn" onclick="selectOpt(this,'f305','7')"><div class="opt-dot"></div>Jerami/ijuk/daun</div>
+        <div class="opt-btn" onclick="selectOpt(this,'f305','8')"><div class="opt-dot"></div>Lainnya</div>
+      </div>
+      <input type="hidden" id="f305">
+    </div>
+
+    <div class="field">
+      <div class="field-label"><span class="fnum">306a</span> Sumber Air Minum Utama <span class="req">*</span></div>
+      <div class="opt-grid cols1">
+        <div class="opt-btn" onclick="selectOpt(this,'f306a','01'); toggle306b([4,5,6,7,8])"><div class="opt-dot"></div>01 — Air kemasan bermerk</div>
+        <div class="opt-btn" onclick="selectOpt(this,'f306a','02'); toggle306b([4,5,6,7,8])"><div class="opt-dot"></div>02 — Air isi ulang</div>
+        <div class="opt-btn" onclick="selectOpt(this,'f306a','03'); toggle306b([4,5,6,7,8])"><div class="opt-dot"></div>03 — Leding</div>
+        <div class="opt-btn" onclick="selectOpt(this,'f306a','04'); toggle306b([4,5,6,7,8],true)"><div class="opt-dot"></div>04 — Sumur bor/pompa</div>
+        <div class="opt-btn" onclick="selectOpt(this,'f306a','05'); toggle306b([4,5,6,7,8],true)"><div class="opt-dot"></div>05 — Sumur terlindung</div>
+        <div class="opt-btn" onclick="selectOpt(this,'f306a','06'); toggle306b([4,5,6,7,8],true)"><div class="opt-dot"></div>06 — Sumur tak terlindung</div>
+        <div class="opt-btn" onclick="selectOpt(this,'f306a','07'); toggle306b([4,5,6,7,8],true)"><div class="opt-dot"></div>07 — Mata air terlindung</div>
+        <div class="opt-btn" onclick="selectOpt(this,'f306a','08'); toggle306b([4,5,6,7,8],true)"><div class="opt-dot"></div>08 — Mata air tak terlindung</div>
+        <div class="opt-btn" onclick="selectOpt(this,'f306a','09'); toggle306b([4,5,6,7,8])"><div class="opt-dot"></div>09 — Air permukaan</div>
+        <div class="opt-btn" onclick="selectOpt(this,'f306a','10'); toggle306b([4,5,6,7,8])"><div class="opt-dot"></div>10 — Air hujan</div>
+        <div class="opt-btn" onclick="selectOpt(this,'f306a','11'); toggle306b([4,5,6,7,8])"><div class="opt-dot"></div>11 — Lainnya</div>
+      </div>
+      <input type="hidden" id="f306a">
+    </div>
+
+    <div class="field" id="field306b" style="display:none">
+      <div class="field-label"><span class="fnum">306b</span> <span class="badge badge-cond">Jika 306a = 4,5,6,7,8</span> Jarak ke Penampungan Limbah</div>
+      <div class="opt-grid">
+        <div class="opt-btn" onclick="selectOpt(this,'f306b','1')"><div class="opt-dot"></div>&lt; 10 meter</div>
+        <div class="opt-btn" onclick="selectOpt(this,'f306b','2')"><div class="opt-dot"></div>≥ 10 meter</div>
+        <div class="opt-btn" onclick="selectOpt(this,'f306b','8')"><div class="opt-dot"></div>Tidak tahu</div>
+      </div>
+      <input type="hidden" id="f306b">
+    </div>
+
+    <div class="field">
+      <div class="field-label"><span class="fnum">307a</span> Sumber Penerangan Utama <span class="req">*</span></div>
+      <div class="opt-grid cols1">
+        <div class="opt-btn" onclick="selectOpt(this,'f307a','1'); toggle307b(true)"><div class="opt-dot"></div>1 — Listrik PLN dengan meteran</div>
+        <div class="opt-btn" onclick="selectOpt(this,'f307a','2'); toggle307b(false)"><div class="opt-dot"></div>2 — Listrik PLN tanpa meteran</div>
+        <div class="opt-btn" onclick="selectOpt(this,'f307a','3'); toggle307b(false)"><div class="opt-dot"></div>3 — Listrik Non-PLN</div>
+        <div class="opt-btn" onclick="selectOpt(this,'f307a','4'); toggle307b(false)"><div class="opt-dot"></div>4 — Bukan listrik</div>
+      </div>
+      <input type="hidden" id="f307a">
+    </div>
+
+    <div class="field" id="field307b" style="display:none">
+      <div class="field-label"><span class="fnum">307b</span> <span class="badge badge-cond">Jika 307a = 1</span> Daya Terpasang (per meteran)</div>
+      <div class="opt-grid">
+        <div class="opt-btn" onclick="selectOpt(this,'f307b','1')"><div class="opt-dot"></div>450 watt</div>
+        <div class="opt-btn" onclick="selectOpt(this,'f307b','2')"><div class="opt-dot"></div>900 watt</div>
+        <div class="opt-btn" onclick="selectOpt(this,'f307b','3')"><div class="opt-dot"></div>1.300 watt</div>
+        <div class="opt-btn" onclick="selectOpt(this,'f307b','4')"><div class="opt-dot"></div>2.200 watt</div>
+        <div class="opt-btn" onclick="selectOpt(this,'f307b','5')"><div class="opt-dot"></div>&gt; 2.200 watt</div>
+      </div>
+      <input type="hidden" id="f307b">
+    </div>
+
+    <div class="field">
+      <div class="field-label"><span class="fnum">308</span> Bahan Bakar Memasak <span class="req">*</span></div>
+      <div class="opt-grid">
+        <div class="opt-btn" onclick="selectOpt(this,'f308','01')"><div class="opt-dot"></div>Listrik</div>
+        <div class="opt-btn" onclick="selectOpt(this,'f308','02')"><div class="opt-dot"></div>Elpiji 5,5/blue gaz</div>
+        <div class="opt-btn" onclick="selectOpt(this,'f308','03')"><div class="opt-dot"></div>Elpiji 12 kg</div>
+        <div class="opt-btn" onclick="selectOpt(this,'f308','04')"><div class="opt-dot"></div>Elpiji 3 kg</div>
+        <div class="opt-btn" onclick="selectOpt(this,'f308','05')"><div class="opt-dot"></div>Gas kota/PGN</div>
+        <div class="opt-btn" onclick="selectOpt(this,'f308','06')"><div class="opt-dot"></div>Biogas</div>
+        <div class="opt-btn" onclick="selectOpt(this,'f308','07')"><div class="opt-dot"></div>Minyak tanah</div>
+        <div class="opt-btn" onclick="selectOpt(this,'f308','08')"><div class="opt-dot"></div>Briket</div>
+        <div class="opt-btn" onclick="selectOpt(this,'f308','09')"><div class="opt-dot"></div>Arang</div>
+        <div class="opt-btn" onclick="selectOpt(this,'f308','10')"><div class="opt-dot"></div>Kayu bakar</div>
+        <div class="opt-btn" onclick="selectOpt(this,'f308','11')"><div class="opt-dot"></div>Lainnya</div>
+        <div class="opt-btn" onclick="selectOpt(this,'f308','00')"><div class="opt-dot"></div>Tidak memasak</div>
+      </div>
+      <input type="hidden" id="f308">
+    </div>
+
+    <div class="field">
+      <div class="field-label"><span class="fnum">309a</span> Kepemilikan Fasilitas Buang Air Besar <span class="req">*</span></div>
+      <div class="opt-grid cols1">
+        <div class="opt-btn" onclick="selectOpt(this,'f309a','1'); toggle309b(true)"><div class="opt-dot"></div>1 — Ada, hanya Anggota Keluarga sendiri</div>
+        <div class="opt-btn" onclick="selectOpt(this,'f309a','2'); toggle309b(true)"><div class="opt-dot"></div>2 — Ada, bersama AK dari keluarga tertentu</div>
+        <div class="opt-btn" onclick="selectOpt(this,'f309a','3'); toggle309b(true)"><div class="opt-dot"></div>3 — Ada, di MCK komunal</div>
+        <div class="opt-btn" onclick="selectOpt(this,'f309a','4'); toggle309b(true)"><div class="opt-dot"></div>4 — Ada, di MCK umum/siapapun</div>
+        <div class="opt-btn" onclick="selectOpt(this,'f309a','5'); toggle309b(false)"><div class="opt-dot"></div>5 — Ada, AK tidak menggunakan</div>
+        <div class="opt-btn" onclick="selectOpt(this,'f309a','6'); toggle309b(false)"><div class="opt-dot"></div>6 — Tidak ada fasilitas</div>
+      </div>
+      <input type="hidden" id="f309a">
+    </div>
+
+    <div class="field" id="field309b" style="display:none">
+      <div class="field-label"><span class="fnum">309b</span> <span class="badge badge-cond">Jika 309a = 1,2,3</span> Jenis Kloset</div>
+      <div class="opt-grid">
+        <div class="opt-btn" onclick="selectOpt(this,'f309b','1')"><div class="opt-dot"></div>Leher angsa</div>
+        <div class="opt-btn" onclick="selectOpt(this,'f309b','2')"><div class="opt-dot"></div>Plengsengan + tutup</div>
+        <div class="opt-btn" onclick="selectOpt(this,'f309b','3')"><div class="opt-dot"></div>Plengsengan tanpa tutup</div>
+        <div class="opt-btn" onclick="selectOpt(this,'f309b','4')"><div class="opt-dot"></div>Cemplung/cubluk</div>
+      </div>
+      <input type="hidden" id="f309b">
+    </div>
+
+    <div class="field">
+      <div class="field-label"><span class="fnum">310</span> Tempat Pembuangan Akhir Tinja <span class="req">*</span></div>
+      <div class="opt-grid cols1">
+        <div class="opt-btn" onclick="selectOpt(this,'f310','1')"><div class="opt-dot"></div>1 — Tangki septik</div>
+        <div class="opt-btn" onclick="selectOpt(this,'f310','2')"><div class="opt-dot"></div>2 — IPAL</div>
+        <div class="opt-btn" onclick="selectOpt(this,'f310','3')"><div class="opt-dot"></div>3 — Kolam/sawah/sungai/danau/laut</div>
+        <div class="opt-btn" onclick="selectOpt(this,'f310','4')"><div class="opt-dot"></div>4 — Lubang tanah</div>
+        <div class="opt-btn" onclick="selectOpt(this,'f310','5')"><div class="opt-dot"></div>5 — Pantai/tanah lapang/kebun</div>
+        <div class="opt-btn" onclick="selectOpt(this,'f310','6')"><div class="opt-dot"></div>6 — Lainnya</div>
+      </div>
+      <input type="hidden" id="f310">
+    </div>
+
+  </div>
+</div>
+
+<!-- ======================================================
+     BLOK IV — KETERANGAN SOSEK ANGGOTA KELUARGA
+====================================================== -->
+<div class="section" id="sec4">
+  <div class="section-header">
+    <div class="snum">IV</div>
+    <div>
+      <h2>Keterangan Sosial Ekonomi</h2>
+      <p>Data per anggota keluarga</p>
+    </div>
+  </div>
+  <div class="card" style="border-radius:0 0 var(--radius) var(--radius)">
+    <div class="member-tabs" id="memberTabs">
+      <div class="member-tab active" onclick="switchMember(0)">Anggota 1</div>
+      <div class="member-tab add-tab" onclick="addMember()">+ Tambah</div>
+    </div>
+    <div id="memberPanels"></div>
+  </div>
+</div>
+
+<!-- ======================================================
+     BLOK V — PROGRAM, ASET, LAYANAN
+====================================================== -->
+<div class="section" id="sec5">
+  <div class="section-header">
+    <div class="snum">V</div>
+    <div>
+      <h2>Program, Aset & Layanan</h2>
+      <p>Kepesertaan program dan kepemilikan aset keluarga</p>
+    </div>
+  </div>
+  <div class="card">
+
+    <div class="divider-label">F. Program Perlindungan Sosial (501)</div>
+
+    <div class="field">
+      <div class="field-label">501a — Program Sembako/BPNT</div>
+      <div class="opt-grid"><div class="opt-btn" onclick="selectOpt(this,'f501a','1')"><div class="opt-dot"></div>Ya</div><div class="opt-btn" onclick="selectOpt(this,'f501a','2')"><div class="opt-dot"></div>Tidak</div></div>
+      <input type="hidden" id="f501a">
+      <div id="f501a_period" style="margin-top:6px;display:none"><input type="text" id="f501a_p" placeholder="Bulan/Tahun terakhir..."></div>
+    </div>
+    <div class="field">
+      <div class="field-label">501b — Program Keluarga Harapan (PKH)</div>
+      <div class="opt-grid"><div class="opt-btn" onclick="selectOpt(this,'f501b','1'); showPeriod('501b',true)"><div class="opt-dot"></div>Ya</div><div class="opt-btn" onclick="selectOpt(this,'f501b','2'); showPeriod('501b',false)"><div class="opt-dot"></div>Tidak</div></div>
+      <input type="hidden" id="f501b">
+      <div id="f501b_period" style="margin-top:6px;display:none"><input type="text" id="f501b_p" placeholder="Bulan/Tahun terakhir..."></div>
+    </div>
+    <div class="field">
+      <div class="field-label">501c — BLT Desa</div>
+      <div class="opt-grid"><div class="opt-btn" onclick="selectOpt(this,'f501c','1'); showPeriod('501c',true)"><div class="opt-dot"></div>Ya</div><div class="opt-btn" onclick="selectOpt(this,'f501c','2'); showPeriod('501c',false)"><div class="opt-dot"></div>Tidak</div></div>
+      <input type="hidden" id="f501c">
+      <div id="f501c_period" style="margin-top:6px;display:none"><input type="text" id="f501c_p" placeholder="Bulan/Tahun terakhir..."></div>
+    </div>
+    <div class="field">
+      <div class="field-label">501d — Subsidi Listrik</div>
+      <div class="opt-grid"><div class="opt-btn" onclick="selectOpt(this,'f501d','1'); showPeriod('501d',true)"><div class="opt-dot"></div>Ya</div><div class="opt-btn" onclick="selectOpt(this,'f501d','2'); showPeriod('501d',false)"><div class="opt-dot"></div>Tidak</div></div>
+      <input type="hidden" id="f501d">
+      <div id="f501d_period" style="margin-top:6px;display:none"><input type="text" id="f501d_p" placeholder="Bulan/Tahun terakhir..."></div>
+    </div>
+    <div class="field">
+      <div class="field-label">501e — Bantuan Pemda</div>
+      <div class="opt-grid"><div class="opt-btn" onclick="selectOpt(this,'f501e','1'); showPeriod('501e',true)"><div class="opt-dot"></div>Ya</div><div class="opt-btn" onclick="selectOpt(this,'f501e','2'); showPeriod('501e',false)"><div class="opt-dot"></div>Tidak</div></div>
+      <input type="hidden" id="f501e">
+      <div id="f501e_period" style="margin-top:6px;display:none"><input type="text" id="f501e_p" placeholder="Bulan/Tahun terakhir..."></div>
+    </div>
+    <div class="field">
+      <div class="field-label">501f — Subsidi Pupuk</div>
+      <div class="opt-grid"><div class="opt-btn" onclick="selectOpt(this,'f501f','1'); showPeriod('501f',true)"><div class="opt-dot"></div>Ya</div><div class="opt-btn" onclick="selectOpt(this,'f501f','2'); showPeriod('501f',false)"><div class="opt-dot"></div>Tidak</div></div>
+      <input type="hidden" id="f501f">
+      <div id="f501f_period" style="margin-top:6px;display:none"><input type="text" id="f501f_p" placeholder="Bulan/Tahun terakhir..."></div>
+    </div>
+    <div class="field">
+      <div class="field-label">501g — Subsidi LPG</div>
+      <div class="opt-grid"><div class="opt-btn" onclick="selectOpt(this,'f501g','1'); showPeriod('501g',true)"><div class="opt-dot"></div>Ya</div><div class="opt-btn" onclick="selectOpt(this,'f501g','2'); showPeriod('501g',false)"><div class="opt-dot"></div>Tidak</div></div>
+      <input type="hidden" id="f501g">
+      <div id="f501g_period" style="margin-top:6px;display:none"><input type="text" id="f501g_p" placeholder="Bulan/Tahun terakhir..."></div>
+    </div>
+
+    <div class="divider-label">Aset Keluarga (502–504)</div>
+
+    <div class="field">
+      <div class="field-label"><span class="fnum">502</span> Aset Bergerak yang Dimiliki (centang semua yang berlaku)</div>
+      <div class="opt-grid cols1" id="asetGrid"></div>
+    </div>
+
+    <div class="field">
+      <div class="field-label"><span class="fnum">503</span> Aset Tidak Bergerak</div>
+      <div class="opt-grid">
+        <div class="chk-btn opt-btn" onclick="toggleChk(this,'f503a')"><div class="opt-dot"></div>Lahan (selain ditempati)</div>
+        <div class="chk-btn opt-btn" onclick="toggleChk(this,'f503b')"><div class="opt-dot"></div>Rumah/bangunan di tempat lain</div>
+      </div>
+      <input type="hidden" id="f503a" value="0">
+      <input type="hidden" id="f503b" value="0">
+    </div>
+
+    <div class="field">
+      <div class="field-label"><span class="fnum">504</span> Jumlah Ternak (ekor)</div>
+      <div class="input-group" style="flex-wrap:wrap; gap:8px;">
+        <div style="flex:1;min-width:80px"><div class="field-label" style="font-size:11px">Sapi</div><input type="number" id="f504a" placeholder="0" min="0"></div>
+        <div style="flex:1;min-width:80px"><div class="field-label" style="font-size:11px">Kerbau</div><input type="number" id="f504b" placeholder="0" min="0"></div>
+        <div style="flex:1;min-width:80px"><div class="field-label" style="font-size:11px">Kuda</div><input type="number" id="f504c" placeholder="0" min="0"></div>
+        <div style="flex:1;min-width:80px"><div class="field-label" style="font-size:11px">Babi</div><input type="number" id="f504d" placeholder="0" min="0"></div>
+        <div style="flex:1;min-width:80px"><div class="field-label" style="font-size:11px">Kambing/Domba</div><input type="number" id="f504e" placeholder="0" min="0"></div>
+      </div>
+    </div>
+
+    <div class="field">
+      <div class="field-label"><span class="fnum">505</span> Jenis Akses Internet Utama</div>
+      <div class="opt-grid cols1">
+        <div class="opt-btn" onclick="selectOpt(this,'f505','0')"><div class="opt-dot"></div>0 — Tidak menggunakan internet</div>
+        <div class="opt-btn" onclick="selectOpt(this,'f505','1')"><div class="opt-dot"></div>1 — Internet & TV digital berlangganan</div>
+        <div class="opt-btn" onclick="selectOpt(this,'f505','2')"><div class="opt-dot"></div>2 — WiFi</div>
+        <div class="opt-btn" onclick="selectOpt(this,'f505','3')"><div class="opt-dot"></div>3 — Internet Handphone</div>
+      </div>
+      <input type="hidden" id="f505">
+    </div>
+
+    <div class="field">
+      <div class="field-label"><span class="fnum">506</span> Rekening Aktif / Dompet Digital</div>
+      <div class="opt-grid">
+        <div class="opt-btn" onclick="selectOpt(this,'f506','1')"><div class="opt-dot"></div>Ya, untuk usaha</div>
+        <div class="opt-btn" onclick="selectOpt(this,'f506','2')"><div class="opt-dot"></div>Ya, untuk pribadi</div>
+        <div class="opt-btn" onclick="selectOpt(this,'f506','3')"><div class="opt-dot"></div>Ya, usaha & pribadi</div>
+        <div class="opt-btn" onclick="selectOpt(this,'f506','4')"><div class="opt-dot"></div>Tidak</div>
+      </div>
+      <input type="hidden" id="f506">
+    </div>
+
+  </div>
+</div>
+
+<!-- ======================================================
+     BLOK VI — RINGKASAN & EXPORT
+====================================================== -->
+<div class="section" id="sec6">
+  <div class="section-header" style="background:var(--green)">
+    <div class="snum">✓</div>
+    <div>
+      <h2>Ringkasan & Kirim Data</h2>
+      <p>Periksa data sebelum menyimpan</p>
+    </div>
+  </div>
+  <div class="card">
+
+    <!-- SETUP URL GOOGLE SHEETS -->
+    <div style="padding:14px;border-bottom:1px solid var(--line)">
+      <div class="field-label" style="margin-bottom:6px">🔗 URL Google Apps Script Web App</div>
+      <input type="text" id="gasUrl" placeholder="https://script.google.com/macros/s/AKfy.../exec"
+        style="font-size:12px" oninput="saveGasUrl()">
+      <div class="input-hint">Isi URL ini sekali saja — akan tersimpan otomatis di perangkat ini.</div>
+    </div>
+
+    <!-- STATUS KONEKSI -->
+    <div id="connStatus" style="display:none;padding:10px 14px;font-size:12px;border-bottom:1px solid var(--line)"></div>
+
+    <div class="alert alert-info" style="margin:14px 14px 0">
+      ℹ️ Periksa kembali data di bawah. Klik <strong>Kirim ke Google Sheets</strong> agar data langsung tersimpan ke spreadsheet pusat.
+    </div>
+    <div id="summaryContent"></div>
+
+    <div style="padding:14px;display:flex;flex-direction:column;gap:10px">
+      <button class="btn btn-success" id="btnKirim" onclick="kirimKeSheets()">
+        ☁ Kirim ke Google Sheets
+      </button>
+      <button class="btn btn-primary" onclick="exportCSV()">⬇ Export CSV (cadangan)</button>
+      <button class="btn btn-outline" onclick="testKoneksi()">🔌 Test Koneksi</button>
+      <button class="btn btn-outline" onclick="resetForm()">↺ Isi Kuesioner Baru</button>
+    </div>
+
+    <!-- RIWAYAT PENGIRIMAN -->
+    <div style="padding:0 14px 14px">
+      <div class="field-label" style="margin-bottom:8px">📋 Riwayat Pengiriman (sesi ini)</div>
+      <div id="riwayat" style="font-size:12px;color:var(--muted)">Belum ada pengiriman.</div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ======================================================
+     BOTTOM NAV
+====================================================== -->
+<div class="bottom-nav">
+  <button class="btn btn-outline" id="btnBack" onclick="navigate(-1)" style="display:none">← Kembali</button>
+  <button class="btn btn-primary" id="btnNext" onclick="navigate(1)">Lanjut →</button>
+</div>
+
+<script>
+// ─── STATE ───────────────────────────────────────────────
+let currentSection = 1;
+const totalSections = 6;
+const sectionNames = [
+  'I. Keterangan Tempat',
+  'II. Keterangan Petugas',
+  'III. Keterangan Perumahan',
+  'IV. Keterangan Sosek Anggota',
+  'V. Program, Aset & Layanan',
+  'VI. Ringkasan & Export'
+];
+
+let members = [createMember(1)];
+let activeMember = 0;
+
+function createMember(n) {
+  return { num: n, data: {} };
+}
+
+// ─── INIT ─────────────────────────────────────────────────
+window.onload = function() {
+  buildProgressSteps();
+  buildAsetGrid();
+  renderMemberPanels();
+  updateNav();
+  loadFromStorage();
+};
+
+// ─── PROGRESS ────────────────────────────────────────────
+function buildProgressSteps() {
+  const wrap = document.getElementById('progressSteps');
+  wrap.innerHTML = '';
+  for (let i = 1; i <= totalSections; i++) {
+    const d = document.createElement('div');
+    d.className = 'ps' + (i < currentSection ? ' done' : i === currentSection ? ' active' : '');
+    wrap.appendChild(d);
+  }
+  document.getElementById('sectionName').textContent = sectionNames[currentSection-1];
+  document.getElementById('sectionCount').textContent = currentSection + ' / ' + totalSections;
+}
+
+// ─── NAVIGATION ──────────────────────────────────────────
+function navigate(dir) {
+  if (dir === 1 && !validateSection(currentSection)) return;
+  if (dir === 1 && currentSection === totalSections - 1) buildSummary();
+  currentSection += dir;
+  if (currentSection < 1) currentSection = 1;
+  if (currentSection > totalSections) currentSection = totalSections;
+
+  document.querySelectorAll('.section').forEach((s,i) => {
+    s.classList.toggle('active', i+1 === currentSection);
+  });
+  buildProgressSteps();
+  updateNav();
+  window.scrollTo(0,0);
+  saveToStorage();
+}
+
+function updateNav() {
+  document.getElementById('btnBack').style.display = currentSection > 1 ? 'block' : 'none';
+  const btn = document.getElementById('btnNext');
+  if (currentSection === totalSections) {
+    btn.textContent = '✓ Selesai';
+    btn.style.display = 'none';
+  } else {
+    btn.style.display = 'block';
+    btn.textContent = currentSection === totalSections - 1 ? 'Lihat Ringkasan →' : 'Lanjut →';
+  }
+}
+
+// ─── VALIDATION ──────────────────────────────────────────
+function validateSection(sec) {
+  const required = {
+    1: ['f101','f102','f103','f104','f108','f112'],
+    2: ['f201','f205'],
+    3: ['f301a','f302','f303','f304','f305','f306a','f307a','f308','f309a','f310'],
+    4: [], 5: [], 6: []
+  };
+  let ok = true;
+  (required[sec]||[]).forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const val = el.value.trim();
+    if (!val) {
+      el.classList.add('error');
+      ok = false;
+    } else { el.classList.remove('error'); }
+  });
+  if (!ok) { showToast('⚠ Mohon lengkapi field yang wajib diisi'); }
+  return ok;
+}
+
+// ─── OPT SELECT ──────────────────────────────────────────
+function selectOpt(btn, fieldId, val) {
+  const parent = btn.parentElement;
+  parent.querySelectorAll('.opt-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  document.getElementById(fieldId).value = val;
+  saveToStorage();
+}
+
+function toggleChk(btn, fieldId) {
+  btn.classList.toggle('selected');
+  document.getElementById(fieldId).value = btn.classList.contains('selected') ? '1' : '0';
+  saveToStorage();
+}
+
+// ─── CONDITIONAL SHOW/HIDE ───────────────────────────────
+function toggle301b(show) {
+  document.getElementById('field301b').style.display = show ? 'block' : 'none';
+}
+function toggle306b(codes, show) {
+  document.getElementById('field306b').style.display = show ? 'block' : 'none';
+}
+function toggle307b(show) {
+  document.getElementById('field307b').style.display = show ? 'block' : 'none';
+}
+function toggle309b(show) {
+  document.getElementById('field309b').style.display = show ? 'block' : 'none';
+}
+function showPeriod(id, show) {
+  const el = document.getElementById('f'+id+'_period');
+  if (el) el.style.display = show ? 'block' : 'none';
+}
+
+// ─── MEMBER MANAGEMENT ───────────────────────────────────
+function updateMemberCount() {
+  const n = parseInt(document.getElementById('f112').value) || 1;
+  while (members.length < n) members.push(createMember(members.length+1));
+  while (members.length > n && members.length > 1) members.pop();
+  if (activeMember >= members.length) activeMember = members.length - 1;
+  renderMemberTabs();
+  renderMemberPanels();
+}
+
+function addMember() {
+  members.push(createMember(members.length+1));
+  activeMember = members.length - 1;
+  renderMemberTabs();
+  renderMemberPanels();
+}
+
+function switchMember(idx) {
+  saveMemberData();
+  activeMember = idx;
+  renderMemberTabs();
+  renderMemberPanels();
+}
+
+function saveMemberData() {
+  const panel = document.getElementById('mp_'+activeMember);
+  if (!panel) return;
+  const d = {};
+  panel.querySelectorAll('input,select,textarea').forEach(el => {
+    if (el.id) d[el.id.replace('_m'+activeMember+'_','')] = el.value;
+  });
+  members[activeMember].data = d;
+}
+
+function renderMemberTabs() {
+  const tabs = document.getElementById('memberTabs');
+  tabs.innerHTML = '';
+  members.forEach((m,i) => {
+    const t = document.createElement('div');
+    t.className = 'member-tab' + (i===activeMember?' active':'');
+    t.textContent = 'Anggota ' + m.num;
+    t.onclick = () => switchMember(i);
+    tabs.appendChild(t);
+  });
+  const add = document.createElement('div');
+  add.className = 'member-tab add-tab';
+  add.textContent = '+ Tambah';
+  add.onclick = addMember;
+  tabs.appendChild(add);
+}
+
+function renderMemberPanels() {
+  const wrap = document.getElementById('memberPanels');
+  wrap.innerHTML = '';
+  members.forEach((m, i) => {
+    const d = m.data || {};
+    const pfx = `_m${i}_`;
+    const p = document.createElement('div');
+    p.className = 'member-panel' + (i===activeMember?' active':'');
+    p.id = 'mp_'+i;
+    p.innerHTML = memberPanelHTML(i, pfx, d);
+    wrap.appendChild(p);
+    // Rebind opt buttons inside panel
+    p.querySelectorAll('.opt-btn[data-field]').forEach(btn => {
+      btn.onclick = () => {
+        const field = btn.dataset.field;
+        const val = btn.dataset.val;
+        p.querySelectorAll(`.opt-btn[data-field="${field}"]`).forEach(b=>b.classList.remove('selected'));
+        btn.classList.add('selected');
+        p.querySelector(`#${field}`).value = val;
+      };
+    });
+  });
+}
+
+function memberPanelHTML(i, pfx, d) {
+  const pid = `_m${i}_`;
+  function opt(field, val, label, type='radio') {
+    const cls = type==='chk'?'chk-btn ':'';
+    return `<div class="${cls}opt-btn" data-field="${field}" data-val="${val}" onclick=""><div class="opt-dot"></div>${label}</div>`;
+  }
+  return `
+  <div class="divider-label">A. Demografi</div>
+  <div class="field">
+    <div class="field-label"><span class="fnum">402</span> Nama Lengkap <span class="req">*</span></div>
+    <input type="text" id="${pid}nama" value="${d.nama||''}" placeholder="Nama sesuai KK...">
+  </div>
+  <div class="field">
+    <div class="field-label"><span class="fnum">403</span> NIK</div>
+    <input type="text" id="${pid}nik" value="${d.nik||''}" placeholder="16 digit NIK..." maxlength="16">
+  </div>
+  <div class="field">
+    <div class="field-label"><span class="fnum">404</span> Keberadaan</div>
+    <div class="opt-grid cols1">
+      ${opt(pid+'keberadaan','1','1 — Tinggal bersama keluarga')}
+      ${opt(pid+'keberadaan','2','2 — Meninggal')}
+      ${opt(pid+'keberadaan','3','3 — Pindah ke wilayah lain di Indonesia')}
+      ${opt(pid+'keberadaan','4','4 — Pindah ke luar negeri')}
+      ${opt(pid+'keberadaan','5','5 — Anggota keluarga baru')}
+      ${opt(pid+'keberadaan','6','6 — Tidak ditemukan')}
+    </div>
+    <input type="hidden" id="${pid}keberadaan" value="${d.keberadaan||''}">
+  </div>
+  <div class="field">
+    <div class="field-label"><span class="fnum">405</span> Jenis Kelamin</div>
+    <div class="opt-grid">
+      ${opt(pid+'jk','1','Laki-laki')}
+      ${opt(pid+'jk','2','Perempuan')}
+    </div>
+    <input type="hidden" id="${pid}jk" value="${d.jk||''}">
+  </div>
+  <div class="field">
+    <div class="field-label"><span class="fnum">406</span> Tanggal Lahir</div>
+    <input type="date" id="${pid}tgl_lahir" value="${d.tgl_lahir||''}">
+  </div>
+  <div class="field">
+    <div class="field-label"><span class="fnum">407</span> Umur (Tahun)</div>
+    <input type="number" id="${pid}umur" value="${d.umur||''}" placeholder="Usia dalam tahun..." min="0" max="120">
+  </div>
+  <div class="field">
+    <div class="field-label"><span class="fnum">408</span> Status Perkawinan</div>
+    <div class="opt-grid">
+      ${opt(pid+'kawin','1','Belum kawin')}
+      ${opt(pid+'kawin','2','Kawin/nikah')}
+      ${opt(pid+'kawin','3','Cerai hidup')}
+      ${opt(pid+'kawin','4','Cerai mati')}
+    </div>
+    <input type="hidden" id="${pid}kawin" value="${d.kawin||''}">
+  </div>
+  <div class="field">
+    <div class="field-label"><span class="fnum">409</span> Hubungan dengan Kepala Keluarga</div>
+    <select id="${pid}hubungan">
+      <option value="">-- Pilih --</option>
+      <option value="1">1 — Kepala keluarga</option>
+      <option value="2">2 — Istri/suami</option>
+      <option value="3">3 — Anak</option>
+      <option value="4">4 — Menantu</option>
+      <option value="5">5 — Cucu</option>
+      <option value="6">6 — Orangtua/mertua</option>
+      <option value="7">7 — Pembantu/sopir</option>
+      <option value="8">8 — Lainnya</option>
+    </select>
+  </div>
+  <div class="field">
+    <div class="field-label"><span class="fnum">410</span> Sedang hamil? <span class="badge badge-age">Wanita 10-54 th</span></div>
+    <div class="opt-grid">
+      ${opt(pid+'hamil','1','Ya')}
+      ${opt(pid+'hamil','2','Tidak')}
+    </div>
+    <input type="hidden" id="${pid}hamil" value="${d.hamil||''}">
+  </div>
+  <div class="field">
+    <div class="field-label"><span class="fnum">411</span> Kartu Identitas yang Dimiliki <span class="badge badge-cond">Jumlahkan kode</span></div>
+    <div class="opt-grid">
+      <div class="chk-btn opt-btn" data-field="${pid}id_akta" data-val="1"><div class="opt-dot"></div>Akta kelahiran</div>
+      <div class="chk-btn opt-btn" data-field="${pid}id_kia" data-val="2"><div class="opt-dot"></div>KIA</div>
+      <div class="chk-btn opt-btn" data-field="${pid}id_ktp" data-val="4"><div class="opt-dot"></div>KTP</div>
+      <div class="chk-btn opt-btn" data-field="${pid}id_none" data-val="0"><div class="opt-dot"></div>Tidak memiliki</div>
+    </div>
+    <input type="hidden" id="${pid}id_akta" value="0">
+    <input type="hidden" id="${pid}id_kia" value="0">
+    <input type="hidden" id="${pid}id_ktp" value="0">
+    <input type="hidden" id="${pid}id_none" value="0">
+  </div>
+
+  <div class="divider-label">B. Pendidikan (usia 5 th ke atas)</div>
+  <div class="field">
+    <div class="field-label"><span class="fnum">412</span> Partisipasi Sekolah</div>
+    <div class="opt-grid cols1">
+      ${opt(pid+'partisipasi','1','1 — Tidak/belum pernah sekolah')}
+      ${opt(pid+'partisipasi','2','2 — Masih sekolah')}
+      ${opt(pid+'partisipasi','3','3 — Tidak bersekolah lagi')}
+    </div>
+    <input type="hidden" id="${pid}partisipasi" value="${d.partisipasi||''}">
+  </div>
+  <div class="field">
+    <div class="field-label"><span class="fnum">413</span> Jenjang Pendidikan Tertinggi</div>
+    <select id="${pid}jenjang">
+      <option value="">-- Pilih jenjang --</option>
+      <option value="01">01 — Paket A</option><option value="02">02 — SDLB</option>
+      <option value="03">03 — SD</option><option value="04">04 — MI</option>
+      <option value="05">05 — SPM/PDF Ula</option><option value="06">06 — Paket B</option>
+      <option value="07">07 — SMP LB</option><option value="08">08 — SMP</option>
+      <option value="09">09 — MTs</option><option value="10">10 — SPM/PDF Wustha</option>
+      <option value="11">11 — Paket C</option><option value="12">12 — SMLB</option>
+      <option value="13">13 — SMA</option><option value="14">14 — MA</option>
+      <option value="15">15 — SMK</option><option value="16">16 — MAK</option>
+      <option value="17">17 — SPM/PDF Ulya</option><option value="18">18 — D1/D2/D3</option>
+      <option value="19">19 — D4/S1</option><option value="20">20 — Profesi</option>
+      <option value="21">21 — S2</option><option value="22">22 — S3</option>
+    </select>
+  </div>
+  <div class="field">
+    <div class="field-label"><span class="fnum">414</span> Kelas Tertinggi yang Pernah/Sedang Diduduki</div>
+    <input type="number" id="${pid}kelas" value="${d.kelas||''}" placeholder="Kelas ke-..." min="1" max="12">
+  </div>
+  <div class="field">
+    <div class="field-label"><span class="fnum">415</span> Ijazah/STTB Tertinggi</div>
+    <select id="${pid}ijazah">
+      <option value="">-- Pilih ijazah --</option>
+      <option value="23">23 — Tidak punya ijazah SD</option>
+      <option value="01">01 — Paket A</option><option value="03">03 — SD</option>
+      <option value="04">04 — MI</option><option value="06">06 — Paket B</option>
+      <option value="08">08 — SMP</option><option value="09">09 — MTs</option>
+      <option value="11">11 — Paket C</option><option value="13">13 — SMA</option>
+      <option value="14">14 — MA</option><option value="15">15 — SMK</option>
+      <option value="16">16 — MAK</option><option value="18">18 — D1/D2/D3</option>
+      <option value="19">19 — D4/S1</option><option value="20">20 — Profesi</option>
+      <option value="21">21 — S2</option><option value="22">22 — S3</option>
+    </select>
+  </div>
+
+  <div class="divider-label">C. Ketenagakerjaan (usia 5 th ke atas)</div>
+  <div class="field">
+    <div class="field-label"><span class="fnum">416a</span> Bekerja seminggu yang lalu?</div>
+    <div class="opt-grid">
+      ${opt(pid+'bekerja','1','Ya')}
+      ${opt(pid+'bekerja','2','Tidak')}
+    </div>
+    <input type="hidden" id="${pid}bekerja" value="${d.bekerja||''}">
+  </div>
+  <div class="field">
+    <div class="field-label"><span class="fnum">416b</span> Jam Kerja</div>
+    <input type="text" id="${pid}jam_kerja" value="${d.jam_kerja||''}" placeholder="Contoh: 40 jam...">
+  </div>
+  <div class="field">
+    <div class="field-label"><span class="fnum">417</span> Lapangan Usaha Pekerjaan Utama</div>
+    <input type="text" id="${pid}lapangan_usaha" value="${d.lapangan_usaha||''}" placeholder="Tuliskan selengkap-lengkapnya...">
+  </div>
+  <div class="field">
+    <div class="field-label"><span class="fnum">418</span> Status dalam Pekerjaan Utama</div>
+    <select id="${pid}status_kerja">
+      <option value="">-- Pilih status --</option>
+      <option value="1">1 — Berusaha sendiri</option>
+      <option value="2">2 — Berusaha + buruh tidak tetap</option>
+      <option value="3">3 — Berusaha + buruh tetap</option>
+      <option value="4">4 — Buruh/karyawan/pegawai swasta</option>
+      <option value="5">5 — PNS/TNI/Polri/BUMN/BUMD</option>
+      <option value="6">6 — Pekerja bebas pertanian</option>
+      <option value="7">7 — Pekerja bebas non-pertanian</option>
+      <option value="8">8 — Pekerja keluarga/tidak dibayar</option>
+    </select>
+  </div>
+  <div class="field">
+    <div class="field-label"><span class="fnum">419</span> Memiliki NPWP?</div>
+    <div class="opt-grid">
+      ${opt(pid+'npwp','1','Ya')}
+      ${opt(pid+'npwp','2','Tidak')}
+    </div>
+    <input type="hidden" id="${pid}npwp" value="${d.npwp||''}">
+  </div>
+
+  <div class="divider-label">E. Kesehatan</div>
+  <div class="field">
+    <div class="field-label"><span class="fnum">427</span> Kondisi Gizi Anak <span class="badge badge-age">Usia 0-4 tahun</span></div>
+    <div class="opt-grid cols1">
+      ${opt(pid+'gizi','1','1 — Kurang gizi (Wasting)')}
+      ${opt(pid+'gizi','2','2 — Kerdil (Stunting)')}
+      ${opt(pid+'gizi','3','3 — Tidak ada catatan')}
+      ${opt(pid+'gizi','8','8 — Tidak tahu')}
+    </div>
+    <input type="hidden" id="${pid}gizi" value="${d.gizi||''}">
+  </div>
+  <div class="field">
+    <div class="field-label"><span class="fnum">428</span> Disabilitas/Kesulitan <span class="badge badge-age">Usia 2 th ke atas</span></div>
+    <div class="opt-grid cols1">
+      <div class="chk-btn opt-btn" data-field="${pid}dis_lihat" data-val="1"><div class="opt-dot"></div>a. Penglihatan</div>
+      <div class="chk-btn opt-btn" data-field="${pid}dis_dengar" data-val="1"><div class="opt-dot"></div>b. Pendengaran</div>
+      <div class="chk-btn opt-btn" data-field="${pid}dis_jalan" data-val="1"><div class="opt-dot"></div>c. Berjalan/naik tangga</div>
+      <div class="chk-btn opt-btn" data-field="${pid}dis_tangan" data-val="1"><div class="opt-dot"></div>d. Menggerakkan tangan/jari</div>
+      <div class="chk-btn opt-btn" data-field="${pid}dis_belajar" data-val="1"><div class="opt-dot"></div>e. Belajar/intelektual</div>
+      <div class="chk-btn opt-btn" data-field="${pid}dis_perilaku" data-val="1"><div class="opt-dot"></div>f. Mengendalikan perilaku</div>
+      <div class="chk-btn opt-btn" data-field="${pid}dis_bicara" data-val="1"><div class="opt-dot"></div>g. Berbicara/komunikasi</div>
+      <div class="chk-btn opt-btn" data-field="${pid}dis_diri" data-val="1"><div class="opt-dot"></div>h. Mengurus diri sendiri</div>
+      <div class="chk-btn opt-btn" data-field="${pid}dis_ingat" data-val="1"><div class="opt-dot"></div>i. Mengingat/konsentrasi</div>
+    </div>
+    <input type="hidden" id="${pid}dis_lihat" value="0">
+    <input type="hidden" id="${pid}dis_dengar" value="0">
+    <input type="hidden" id="${pid}dis_jalan" value="0">
+    <input type="hidden" id="${pid}dis_tangan" value="0">
+    <input type="hidden" id="${pid}dis_belajar" value="0">
+    <input type="hidden" id="${pid}dis_perilaku" value="0">
+    <input type="hidden" id="${pid}dis_bicara" value="0">
+    <input type="hidden" id="${pid}dis_diri" value="0">
+    <input type="hidden" id="${pid}dis_ingat" value="0">
+  </div>
+  <div class="field">
+    <div class="field-label"><span class="fnum">430</span> Keluhan Kesehatan Kronis/Menahun</div>
+    <select id="${pid}penyakit">
+      <option value="01">01 — Tidak ada</option>
+      <option value="02">02 — Hipertensi</option><option value="03">03 — Rematik</option>
+      <option value="04">04 — Asma</option><option value="05">05 — Masalah jantung</option>
+      <option value="06">06 — Diabetes</option><option value="07">07 — TBC</option>
+      <option value="08">08 — Stroke</option><option value="09">09 — Kanker/tumor ganas</option>
+      <option value="10">10 — Gagal ginjal</option><option value="11">11 — Haemophilia</option>
+      <option value="12">12 — HIV/AIDS</option><option value="13">13 — Kolesterol</option>
+      <option value="14">14 — Sirosis hati</option><option value="15">15 — Thalasemia</option>
+      <option value="16">16 — Leukimia</option><option value="17">17 — Alzheimer</option>
+      <option value="18">18 — Lainnya</option>
+    </select>
+  </div>
+  <div class="field">
+    <div class="field-label"><span class="fnum">431a</span> Jaminan Kesehatan <span class="badge badge-cond">Jumlahkan kode</span></div>
+    <div class="opt-grid cols1">
+      <div class="chk-btn opt-btn" data-field="${pid}jkn_pbi" data-val="1"><div class="opt-dot"></div>PBI JKN</div>
+      <div class="chk-btn opt-btn" data-field="${pid}jkn_mandiri" data-val="2"><div class="opt-dot"></div>JKN Mandiri</div>
+      <div class="chk-btn opt-btn" data-field="${pid}jkn_kerja" data-val="4"><div class="opt-dot"></div>JKN Pemberi Kerja</div>
+      <div class="chk-btn opt-btn" data-field="${pid}jkn_lain" data-val="8"><div class="opt-dot"></div>Jamkes Lainnya</div>
+      <div class="chk-btn opt-btn" data-field="${pid}jkn_none" data-val="0"><div class="opt-dot"></div>Tidak memiliki</div>
+    </div>
+    <input type="hidden" id="${pid}jkn_pbi" value="0">
+    <input type="hidden" id="${pid}jkn_mandiri" value="0">
+    <input type="hidden" id="${pid}jkn_kerja" value="0">
+    <input type="hidden" id="${pid}jkn_lain" value="0">
+    <input type="hidden" id="${pid}jkn_none" value="0">
+  </div>
+  `;
+}
+
+// ─── ASET GRID ────────────────────────────────────────────
+function buildAsetGrid() {
+  const items = [
+    ['502a','Tabung gas 5,5 kg+'],['502b','Lemari es/kulkas'],
+    ['502c','AC'],['502d','Pemanas air'],
+    ['502e','Telepon rumah'],['502f','TV layar datar ≥30"'],
+    ['502g','Emas/perhiasan ≥10g'],['502h','Komputer/Laptop/Tablet'],
+    ['502i','Sepeda Motor'],['502j','Sepeda'],
+    ['502k','Mobil'],['502l','Perahu'],
+    ['502m','Kapal/Perahu Motor'],['502n','Smartphone'],
+  ];
+  const grid = document.getElementById('asetGrid');
+  let html = '<div class="opt-grid">';
+  items.forEach(([id, label]) => {
+    html += `<div class="chk-btn opt-btn" onclick="toggleChk(this,'${id}')"><div class="opt-dot"></div>${label}</div>`;
+    html += `<input type="hidden" id="${id}" value="0">`;
+  });
+  html += '</div>';
+  grid.innerHTML = html;
+}
+
+// ─── SUMMARY ────────────────────────────────────────────
+function buildSummary() {
+  saveMemberData();
+  const rows = [
+    ['Provinsi', v('f101')],
+    ['Kabupaten/Kota', v('f102')],
+    ['Kecamatan', v('f103')],
+    ['Desa/Kelurahan', v('f104')],
+    ['Kepala Keluarga', v('f108')],
+    ['Jumlah Anggota', v('f112')],
+    ['Nomor KK', v('f114')],
+    ['Tanggal Pendataan', v('f201')],
+    ['PPL', v('f202a')],
+    ['Hasil Pendataan', v('f205')],
+    ['Status Bangunan', v('f301a')],
+    ['Luas Lantai', v('f302') + ' m²'],
+    ['Jenis Lantai', v('f303')],
+    ['Sumber Air', v('f306a')],
+    ['Sumber Penerangan', v('f307a')],
+    ['Bahan Bakar', v('f308')],
+    ['Jamban', v('f309a')],
+    ['Pembuangan Tinja', v('f310')],
+  ];
+
+  let html = '';
+  rows.forEach(([k,val]) => {
+    if (!val) return;
+    html += `<div class="summary-item"><div class="summary-key">${k}</div><div class="summary-val">${val}</div></div>`;
+  });
+
+  html += `<div class="divider-label">Anggota Keluarga (${members.length} orang)</div>`;
+  members.forEach((m,i) => {
+    const pfx = `_m${i}_`;
+    const nama = document.getElementById(pfx+'nama')?.value || '(tanpa nama)';
+    const nik  = document.getElementById(pfx+'nik')?.value  || '-';
+    const umur = document.getElementById(pfx+'umur')?.value || '-';
+    html += `<div class="summary-item"><div class="summary-key">Anggota ${i+1}</div><div class="summary-val">${nama}<br><small style="color:var(--muted)">${nik} · ${umur} th</small></div></div>`;
+  });
+
+  document.getElementById('summaryContent').innerHTML = html;
+}
+
+function v(id) {
+  const el = document.getElementById(id);
+  return el ? el.value : '';
+}
+
+// ─── EXPORT CSV ──────────────────────────────────────────
+function exportCSV() {
+  saveMemberData();
+  const rows = [];
+  const base = {
+    provinsi: v('f101'), kabupaten: v('f102'), kecamatan: v('f103'),
+    desa: v('f104'), kode_sls: v('f105a'), sub_sls: v('f105b'),
+    nama_sls: v('f106'), alamat: v('f107'), kepala_keluarga: v('f108'),
+    no_urut_bangunan: v('f109'), no_urut_keluarga: v('f110'),
+    status_keluarga: v('f111'), jumlah_anggota: v('f112'),
+    id_landmark: v('f113'), nomor_kk: v('f114'), kode_kk: v('f115'),
+    tgl_pendataan: v('f201'), nama_ppl: v('f202a'), kode_ppl: v('f202b'),
+    tgl_pemeriksaan: v('f203'), nama_pml: v('f204a'), kode_pml: v('f204b'),
+    hasil_pendataan: v('f205'), hp_responden: v('f_hp'),
+    status_bangunan: v('f301a'), bukti_kepemilikan: v('f301b'),
+    luas_lantai: v('f302'), jenis_lantai: v('f303'),
+    jenis_dinding: v('f304'), jenis_atap: v('f305'),
+    sumber_air: v('f306a'), jarak_air_limbah: v('f306b'),
+    sumber_penerangan: v('f307a'), daya_listrik: v('f307b'),
+    bahan_bakar: v('f308'), fasilitas_bab: v('f309a'),
+    jenis_kloset: v('f309b'), tpa_tinja: v('f310'),
+    prg_sembako: v('f501a'), prg_pkh: v('f501b'), prg_blt: v('f501c'),
+    prg_listrik: v('f501d'), prg_pemda: v('f501e'),
+    prg_pupuk: v('f501f'), prg_lpg: v('f501g'),
+    aset_gas: v('502a'), aset_kulkas: v('502b'), aset_ac: v('502c'),
+    aset_pemanas: v('502d'), aset_telp: v('502e'), aset_tv: v('502f'),
+    aset_emas: v('502g'), aset_laptop: v('502h'), aset_motor: v('502i'),
+    aset_sepeda: v('502j'), aset_mobil: v('502k'), aset_perahu: v('502l'),
+    aset_kapal: v('502m'), aset_hp: v('502n'),
+    aset_lahan: v('f503a'), aset_rumah_lain: v('f503b'),
+    ternak_sapi: v('f504a'), ternak_kerbau: v('f504b'),
+    ternak_kuda: v('f504c'), ternak_babi: v('f504d'), ternak_kambing: v('f504e'),
+    internet: v('f505'), rekening_digital: v('f506'),
+  };
+
+  members.forEach((m,i) => {
+    const pfx = `_m${i}_`;
+    const row = { ...base, no_anggota: i+1 };
+    ['nama','nik','keberadaan','jk','tgl_lahir','umur','kawin','hubungan',
+     'hamil','partisipasi','jenjang','kelas','ijazah','bekerja','jam_kerja',
+     'lapangan_usaha','status_kerja','npwp','gizi',
+     'dis_lihat','dis_dengar','dis_jalan','dis_tangan','dis_belajar',
+     'dis_perilaku','dis_bicara','dis_diri','dis_ingat',
+     'penyakit','jkn_pbi','jkn_mandiri','jkn_kerja','jkn_lain',
+     'id_akta','id_kia','id_ktp'
+    ].forEach(k => {
+      const el = document.getElementById(pfx+k);
+      row['m_'+k] = el ? el.value : '';
+    });
+    rows.push(row);
+  });
+
+  const headers = Object.keys(rows[0]);
+  const csvRows = [headers.join(',')];
+  rows.forEach(r => {
+    csvRows.push(headers.map(h => '"' + String(r[h]||'').replace(/"/g,'""') + '"').join(','));
+  });
+
+  const blob = new Blob([csvRows.join('\n')], { type: 'text/csv;charset=utf-8;' });
+  const url  = URL.createObjectURL(blob);
+  const kk   = v('f108') || 'keluarga';
+  const date = v('f201') || new Date().toISOString().split('T')[0];
+  const a    = document.createElement('a');
+  a.href = url; a.download = `SDDI_${kk}_${date}.csv`;
+  a.click(); URL.revokeObjectURL(url);
+  showToast('✓ File CSV berhasil diunduh!');
+}
+
+// ─── STORAGE ────────────────────────────────────────────
+function saveToStorage() {
+  try {
+    const state = {};
+    document.querySelectorAll('input,select,textarea').forEach(el => {
+      if (el.id) state[el.id] = el.value;
+    });
+    state.__members = members.length;
+    sessionStorage.setItem('sddi_draft', JSON.stringify(state));
+  } catch(e){}
+}
+
+function loadFromStorage() {
+  try {
+    const raw = sessionStorage.getItem('sddi_draft');
+    if (!raw) return;
+    const state = JSON.parse(raw);
+    Object.keys(state).forEach(id => {
+      if (id === '__members') return;
+      const el = document.getElementById(id);
+      if (el) el.value = state[id];
+    });
+    showToast('Draft tersimpan dimuat kembali');
+  } catch(e){}
+  // Load saved GAS URL
+  try {
+    const savedUrl = localStorage.getItem('sddi_gas_url');
+    if (savedUrl) document.getElementById('gasUrl').value = savedUrl;
+  } catch(e){}
+}
+
+function save() { saveToStorage(); }
+
+function saveGasUrl() {
+  try { localStorage.setItem('sddi_gas_url', document.getElementById('gasUrl').value); } catch(e){}
+}
+
+function resetForm() {
+  if (!confirm('Yakin ingin mengosongkan semua data dan mulai kuesioner baru?')) return;
+
+  // 1. Hapus storage
+  sessionStorage.removeItem('sddi_draft');
+
+  // 2. Kosongkan semua input/select/textarea (kecuali gasUrl)
+  document.querySelectorAll('input, select, textarea').forEach(el => {
+    if (el.id === 'gasUrl') return; // jangan hapus URL GAS
+    if (el.type === 'hidden') { el.value = ''; return; }
+    if (el.tagName === 'SELECT') { el.selectedIndex = 0; return; }
+    el.value = '';
+  });
+
+  // 3. Hapus semua visual "selected" dari tombol pilihan
+  document.querySelectorAll('.opt-btn').forEach(b => b.classList.remove('selected'));
+
+  // 4. Sembunyikan field kondisional
+  ['field301b','field306b','field307b','field309b'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.style.display = 'none';
+  });
+  document.querySelectorAll('[id$="_period"]').forEach(el => el.style.display = 'none');
+
+  // 5. Reset anggota keluarga ke 1 orang kosong
+  members = [createMember(1)];
+  activeMember = 0;
+  renderMemberTabs();
+  renderMemberPanels();
+
+  // 6. Kembali ke halaman pertama
+  currentSection = 1;
+  document.querySelectorAll('.section').forEach((s, i) => {
+    s.classList.toggle('active', i === 0);
+  });
+  buildProgressSteps();
+  updateNav();
+  window.scrollTo(0, 0);
+
+  showToast('✅ Formulir berhasil dikosongkan');
+}
+
+// ─── COLLECT PAYLOAD ─────────────────────────────────────
+function collectPayload() {
+  saveMemberData();
+  const keluarga = {};
+  ['f101','f102','f103','f104','f105a','f105b','f106','f107','f108','f109',
+   'f110','f111','f112','f113','f114','f115','f201','f202a','f202b','f203',
+   'f204a','f204b','f205','f_hp','f301a','f301b','f302','f303','f304','f305',
+   'f306a','f306b','f307a','f307b','f308','f309a','f309b','f310',
+   'f501a','f501a_p','f501b','f501b_p','f501c','f501c_p','f501d','f501d_p',
+   'f501e','f501e_p','f501f','f501f_p','f501g','f501g_p',
+   '502a','502b','502c','502d','502e','502f','502g','502h',
+   '502i','502j','502k','502l','502m','502n',
+   'f503a','f503b','f504a','f504b','f504c','f504d','f504e','f505','f506'
+  ].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) keluarga[id] = el.value;
+  });
+
+  const anggotaData = members.map((m, i) => {
+    const pfx = `_m${i}_`;
+    const obj = {};
+    ['nama','nik','keberadaan','jk','tgl_lahir','umur','kawin','hubungan',
+     'hamil','id_akta','id_kia','id_ktp','partisipasi','jenjang','kelas',
+     'ijazah','bekerja','jam_kerja','lapangan_usaha','status_kerja','npwp',
+     'gizi','dis_lihat','dis_dengar','dis_jalan','dis_tangan','dis_belajar',
+     'dis_perilaku','dis_bicara','dis_diri','dis_ingat','penyakit',
+     'jkn_pbi','jkn_mandiri','jkn_kerja','jkn_lain'
+    ].forEach(k => {
+      const el = document.getElementById(pfx + k);
+      obj[k] = el ? el.value : '';
+    });
+    return obj;
+  });
+
+  return { keluarga, anggota: anggotaData };
+}
+
+// ─── KIRIM KE GOOGLE SHEETS (via hidden form — bypass CORS) ─
+async function kirimKeSheets() {
+  const gasUrl = document.getElementById('gasUrl').value.trim();
+  if (!gasUrl) {
+    showToast('⚠ Isi URL Google Apps Script terlebih dahulu!');
+    document.getElementById('gasUrl').focus();
+    return;
+  }
+
+  const btn = document.getElementById('btnKirim');
+  btn.disabled = true;
+  btn.textContent = '⏳ Mengirim...';
+  setConnStatus('loading', 'Mengirim data ke Google Sheets...');
+
+  try {
+    const payload = collectPayload();
+
+    // Kirim via fetch no-cors (GAS menerima FormData/URLencoded)
+    const form = new FormData();
+    form.append('data', JSON.stringify(payload));
+
+    // no-cors: kita tidak bisa baca respons, tapi data terkirim
+    await fetch(gasUrl, {
+      method: 'POST',
+      mode: 'no-cors',
+      body: form
+    });
+
+    // Karena no-cors tidak bisa baca respons, anggap sukses jika tidak error
+    const fakeId = 'SDDI-' + Date.now();
+    setConnStatus('ok', `✅ Data terkirim! (${new Date().toLocaleTimeString('id-ID')})`);
+    addRiwayat('✅', fakeId, v('f108'), v('f104'));
+    showToast('✅ Berhasil dikirim ke Google Sheets!');
+    btn.textContent = '✅ Terkirim!';
+    setTimeout(() => { btn.disabled = false; btn.textContent = '☁ Kirim ke Google Sheets'; }, 3000);
+
+  } catch(err) {
+    setConnStatus('error', '❌ Gagal: ' + err.message);
+    showToast('❌ Gagal mengirim. Coba export CSV sebagai cadangan.');
+    btn.disabled = false;
+    btn.textContent = '☁ Kirim ke Google Sheets';
+  }
+}
+
+// ─── TEST KONEKSI ────────────────────────────────────────
+async function testKoneksi() {
+  const gasUrl = document.getElementById('gasUrl').value.trim();
+  if (!gasUrl) { showToast('⚠ Isi URL terlebih dahulu!'); return; }
+  setConnStatus('loading', 'Memeriksa koneksi...');
+  try {
+    // GET request — bisa dibaca responnya (tidak kena CORS)
+    const resp = await fetch(gasUrl, { method: 'GET' });
+    const result = await resp.json();
+    if (result.status === 'ok') {
+      setConnStatus('ok', '✅ Koneksi berhasil! API aktif dan siap menerima data.');
+      showToast('✅ Koneksi ke Google Sheets OK!');
+    } else { throw new Error('Respons tidak dikenal'); }
+  } catch(e) {
+    setConnStatus('error', '❌ Tidak dapat terhubung. Pastikan URL benar dan sudah di-deploy ulang.');
+  }
+}
+
+function setConnStatus(type, msg) {
+  const el = document.getElementById('connStatus');
+  el.style.display = 'block';
+  const colors = { ok: '#e0f9ec', error: '#fff0f0', loading: '#e8f4ff' };
+  const text   = { ok: '#005c30', error: '#8b0000', loading: '#1a4baa' };
+  el.style.background = colors[type] || '#eee';
+  el.style.color = text[type] || '#333';
+  el.textContent = msg;
+}
+
+let riwayatList = [];
+function addRiwayat(status, id, nama, desa) {
+  riwayatList.unshift({ status, id, nama, desa, waktu: new Date().toLocaleTimeString('id-ID') });
+  const el = document.getElementById('riwayat');
+  el.innerHTML = riwayatList.map(r =>
+    `<div style="padding:6px 0;border-bottom:1px solid var(--line);display:flex;justify-content:space-between">
+      <span>${r.status} ${r.nama} — ${r.desa}</span>
+      <span style="color:var(--muted)">${r.waktu}</span>
+    </div>`
+  ).join('');
+}
+
+// ─── TOAST ───────────────────────────────────────────────
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// Auto-save on any input change
+document.addEventListener('change', saveToStorage);
+document.addEventListener('input', saveToStorage);
+</script>
+</body>
+</html>
